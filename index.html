@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<title>Wildn | Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: #6c5ce7;
+  --primary-light: #a29bfe;
+  --accent: #00cec9;
+  --accent-glow: #00fff0;
+  --dark: #0a0a0f;
+  --dark-card: #12121a;
+  --dark-surface: #1a1a2e;
+  --text: #e0e0e0;
+  --text-muted: #8888a0;
+  --gradient-1: linear-gradient(135deg, #6c5ce7, #00cec9);
+  --gradient-2: linear-gradient(135deg, #fd79a8, #6c5ce7);
+  --gradient-3: linear-gradient(135deg, #00cec9, #55efc4);
+}
+
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--primary) var(--dark); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; line-height: 1.6; }
+h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+.cursor-glow { position: fixed; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(108,92,231,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%); }
+
+.preloader { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; transition: opacity 0.6s ease, visibility 0.6s ease; }
+.preloader.hidden { opacity: 0; visibility: hidden; }
+.preloader-ring { width: 60px; height: 60px; border: 3px solid transparent; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; position: relative; }
+.preloader-ring::before { content: ''; position: absolute; inset: 6px; border: 3px solid transparent; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear reverse infinite; }
+.preloader-text { font-family: 'Space Grotesk', sans-serif; font-size: 14px; letter-spacing: 6px; text-transform: uppercase; color: var(--text-muted); }
+
+.navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; transition: all 0.4s ease; }
+.navbar.scrolled { background: rgba(10,10,15,0.85); backdrop-filter: blur(20px); padding: 14px 60px; border-bottom: 1px solid rgba(108,92,231,0.15); }
+.nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-logo span { display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-left: 2px; animation: pulse-dot 2s ease-in-out infinite; }
+.nav-links { display: flex; gap: 36px; list-style: none; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; position: relative; transition: color 0.3s ease; }
+.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--gradient-1); transition: width 0.3s ease; }
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+
+section { position: relative; z-index: 1; }
+.section-padding { padding: 100px 60px; }
+.section-label { font-size: 12px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+.section-label::before { content: ''; width: 40px; height: 1px; background: var(--accent); }
+.section-title { font-size: clamp(32px, 4vw, 48px); font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+.section-subtitle { font-size: 16px; color: var(--text-muted); max-width: 600px; line-height: 1.7; }
+
+.reveal { opacity: 0; transform: translateY(60px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.active { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-80px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-left.active { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(80px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-right.active { opacity: 1; transform: translateX(0); }
+.reveal-scale { opacity: 0; transform: scale(0.85); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-scale.active { opacity: 1; transform: scale(1); }
+.stagger > * { transition-delay: calc(var(--i, 0) * 0.1s); }
+
+.hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 80px 60px 0; }
+.hero-bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(108,92,231,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(108,92,231,0.05) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%); }
+.hero-orbs { position: absolute; inset: 0; overflow: hidden; }
+.hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; }
+.hero-orb-1 { width: 500px; height: 500px; background: var(--primary); top: -10%; right: -5%; animation: float-orb 8s ease-in-out infinite; }
+.hero-orb-2 { width: 400px; height: 400px; background: var(--accent); bottom: -10%; left: -5%; animation: float-orb 10s ease-in-out infinite reverse; }
+.hero-orb-3 { width: 300px; height: 300px; background: #fd79a8; top: 50%; left: 40%; animation: float-orb 12s ease-in-out infinite 2s; }
+.hero-content { text-align: center; position: relative; z-index: 2; max-width: 900px; }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(108,92,231,0.12); border: 1px solid rgba(108,92,231,0.25); border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--primary-light); margin-bottom: 32px; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.3s; }
+.hero-tag-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+.hero-name { font-size: clamp(48px, 8vw, 96px); font-weight: 900; line-height: 1; margin-bottom: 24px; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.5s; }
+.hero-name .gradient-text { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-desc { font-size: clamp(16px, 2vw, 22px); color: var(--text-muted); max-width: 600px; margin: 0 auto 48px; line-height: 1.7; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.7s; }
+.hero-cta { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.9s; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 36px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; cursor: pointer; border: none; font-family: 'Inter', sans-serif; }
+.btn-primary { background: var(--gradient-1); color: #fff; box-shadow: 0 4px 30px rgba(108,92,231,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(108,92,231,0.5); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.15); }
+.btn-ghost:hover { border-color: var(--primary); background: rgba(108,92,231,0.08); transform: translateY(-2px); }
+.hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; opacity: 0; animation: fadeInUp 0.8s ease forwards 1.2s; }
+.scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--primary), transparent); animation: scroll-bounce 2s ease-in-out infinite; }
+
+.about { background: var(--dark); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+.about-image-wrapper { position: relative; }
+.about-image { width: 100%; aspect-ratio: 3/4; border-radius: 20px; background: var(--dark-surface); overflow: hidden; position: relative; }
+.about-image::before { content: ''; position: absolute; inset: 0; background: var(--gradient-1); opacity: 0.15; }
+.about-image-border { position: absolute; inset: -1px; border-radius: 21px; padding: 1px; background: var(--gradient-1); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.about-float-card { position: absolute; background: rgba(18,18,26,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(108,92,231,0.2); border-radius: 16px; padding: 20px 24px; }
+.about-float-card.card-1 { bottom: -20px; right: -30px; }
+.about-float-card.card-2 { top: -20px; left: -30px; }
+.about-float-number { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.about-float-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.about-content { max-width: 520px; }
+.about-content p { color: var(--text-muted); margin-bottom: 16px; font-size: 15px; line-height: 1.7; }
+.about-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+.about-stat { text-align: center; padding: 16px; background: var(--dark-card); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+.about-stat-number { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: var(--accent); }
+.about-stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+.skills { background: var(--dark); }
+.skills-container { max-width: 1200px; margin: 0 auto; }
+.skills-header { text-align: center; margin-bottom: 60px; }
+.skills-categories { display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
+.skill-cat-btn { padding: 10px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+.skill-cat-btn.active, .skill-cat-btn:hover { background: rgba(108,92,231,0.15); border-color: var(--primary); color: var(--primary-light); }
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+.skill-card { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 32px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
+.skill-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-1); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+.skill-card:hover::before { transform: scaleX(1); }
+.skill-card:hover { transform: translateY(-6px); border-color: rgba(108,92,231,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.skill-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
+.skill-icon.icon-purple { background: rgba(108,92,231,0.15); }
+.skill-icon.icon-teal { background: rgba(0,206,201,0.15); }
+.skill-icon.icon-pink { background: rgba(253,121,168,0.15); }
+.skill-icon.icon-green { background: rgba(85,239,196,0.15); }
+.skill-icon.icon-orange { background: rgba(255,159,67,0.15); }
+.skill-icon.icon-blue { background: rgba(116,185,255,0.15); }
+.skill-icon.icon-yellow { background: rgba(253,203,110,0.15); }
+.skill-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.skill-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
+.skill-bar-wrapper { margin-top: 16px; }
+.skill-bar-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+.skill-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+.skill-bar-fill { height: 100%; border-radius: 4px; background: var(--gradient-1); width: 0%; transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.projects { background: var(--dark); }
+.projects-container { max-width: 1200px; margin: 0 auto; }
+.projects-header { text-align: center; margin-bottom: 60px; }
+.project-card { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 120px; position: relative; }
+.project-card:nth-child(even) { direction: rtl; }
+.project-card:nth-child(even) > * { direction: ltr; }
+.project-preview { position: relative; border-radius: 20px; overflow: hidden; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); aspect-ratio: 16/10; }
+.project-preview-inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.project-preview-bg { position: absolute; inset: 0; opacity: 0.5; }
+.project-preview-bg.bg-1 { background: linear-gradient(135deg, #6c5ce7, #00cec9); }
+.project-preview-bg.bg-2 { background: linear-gradient(135deg, #fd79a8, #6c5ce7); }
+.project-preview-bg.bg-3 { background: linear-gradient(135deg, #00cec9, #55efc4); }
+.project-preview-bg.bg-4 { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+.project-preview-content { position: relative; z-index: 2; text-align: center; padding: 40px; }
+.project-preview-icon { font-size: 64px; margin-bottom: 16px; filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3)); }
+.project-preview-label { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.8); }
+.project-info { max-width: 480px; }
+.project-number { font-family: 'Space Grotesk', sans-serif; font-size: 72px; font-weight: 900; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0.2; line-height: 1; margin-bottom: 16px; }
+.project-info h3 { font-size: 28px; font-weight: 700; margin-bottom: 16px; }
+.project-info p { color: var(--text-muted); font-size: 16px; line-height: 1.8; margin-bottom: 24px; }
+.project-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.project-tag { padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 500; background: rgba(108,92,231,0.1); color: var(--primary-light); border: 1px solid rgba(108,92,231,0.2); }
+.project-links { display: flex; gap: 16px; }
+.project-link { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+.project-link-primary { background: var(--gradient-1); color: #fff; }
+.project-link-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,92,231,0.3); }
+.project-link-secondary { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+.project-link-secondary:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+.timeline-section { background: var(--dark); }
+.timeline-container { max-width: 800px; margin: 0 auto; position: relative; }
+.timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(108,92,231,0.2); transform: translateX(-50%); }
+.timeline-line-fill { width: 100%; height: 0%; background: var(--gradient-1); transition: height 0.1s linear; }
+.timeline-item { display: flex; align-items: flex-start; margin-bottom: 60px; position: relative; }
+.timeline-item:nth-child(odd) { justify-content: flex-start; padding-right: calc(50% + 40px); text-align: right; }
+.timeline-item:nth-child(even) { justify-content: flex-end; padding-left: calc(50% + 40px); text-align: left; }
+.timeline-dot { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--dark); border: 3px solid var(--primary); z-index: 2; transition: all 0.3s ease; }
+.timeline-item:hover .timeline-dot { background: var(--primary); box-shadow: 0 0 20px rgba(108,92,231,0.5); }
+.timeline-date { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.timeline-item h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.timeline-item h4 { font-size: 14px; color: var(--primary-light); font-weight: 500; margin-bottom: 12px; }
+.timeline-item p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+.testimonials { background: var(--dark); }
+.testimonials-container { max-width: 1200px; margin: 0 auto; }
+.testimonials-header { text-align: center; margin-bottom: 60px; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.testimonial-card { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 36px; transition: all 0.4s ease; position: relative; }
+.testimonial-card:hover { transform: translateY(-4px); border-color: rgba(108,92,231,0.2); }
+.testimonial-quote { font-size: 40px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 16px; }
+.testimonial-card p { font-size: 15px; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 14px; }
+.testimonial-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: #fff; }
+.testimonial-name { font-size: 14px; font-weight: 600; }
+.testimonial-role { font-size: 12px; color: var(--text-muted); }
+
+.contact { background: var(--dark); }
+.contact-container { max-width: 900px; margin: 0 auto; }
+.contact-header { text-align: center; margin-bottom: 60px; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+.contact-methods { display: flex; flex-direction: column; gap: 24px; }
+.contact-method { display: flex; align-items: center; gap: 20px; padding: 24px; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; text-decoration: none; color: inherit; transition: all 0.3s ease; }
+.contact-method:hover { border-color: rgba(108,92,231,0.3); transform: translateX(4px); }
+.contact-method-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.contact-method-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.contact-method-value { font-size: 16px; font-weight: 500; margin-top: 2px; }
+.contact-form { display: flex; flex-direction: column; gap: 20px; }
+.form-group { position: relative; }
+.form-group input, .form-group textarea { width: 100%; padding: 16px 20px; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text); font-size: 15px; font-family: 'Inter', sans-serif; transition: all 0.3s ease; outline: none; }
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-muted); }
+.form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,92,231,0.1); }
+.form-group textarea { min-height: 140px; resize: vertical; }
+.contact-form .btn-primary { align-self: flex-start; width: 100%; justify-content: center; }
+
+.footer { padding: 60px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--dark); }
+.footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.footer-text { font-size: 14px; color: var(--text-muted); }
+.footer-socials { display: flex; gap: 16px; }
+.footer-social { width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; font-size: 18px; transition: all 0.3s ease; }
+.footer-social:hover { border-color: var(--primary); color: var(--primary-light); transform: translateY(-2px); }
+
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient-1); z-index: 9999; width: 0%; transition: width 0.1s linear; }
+.back-to-top { position: fixed; bottom: 30px; right: 30px; width: 48px; height: 48px; border-radius: 14px; background: var(--dark-card); border: 1px solid rgba(108,92,231,0.3); color: var(--primary-light); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 100; font-size: 20px; }
+.back-to-top.visible { opacity: 1; visibility: visible; }
+.back-to-top:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
+@keyframes float-orb { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(30px, -30px); } 66% { transform: translate(-20px, 20px); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scroll-bounce { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(0.5); opacity: 0.5; } }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+.marquee-banner { overflow: hidden; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); background: rgba(108,92,231,0.02); }
+.marquee-track { display: flex; gap: 60px; animation: marquee 30s linear infinite; width: max-content; }
+.marquee-item { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; display: flex; align-items: center; gap: 12px; }
+.marquee-item span { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+
+.translate-wrapper { position: relative; margin-left: 20px; }
+.translate-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+.translate-toggle:hover { border-color: var(--primary); background: rgba(108,92,231,0.08); color: var(--text); }
+.translate-toggle-icon { font-size: 16px; }
+.translate-toggle-arrow { font-size: 10px; transition: transform 0.3s ease; margin-left: 2px; }
+.translate-wrapper.open .translate-toggle-arrow { transform: rotate(180deg); }
+.translate-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 200px; max-height: 320px; overflow-y: auto; background: var(--dark-card); border: 1px solid rgba(108,92,231,0.2); border-radius: 14px; padding: 8px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.25s ease; z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.translate-wrapper.open .translate-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+.translate-dropdown::-webkit-scrollbar { width: 4px; }
+.translate-dropdown::-webkit-scrollbar-track { background: transparent; }
+.translate-dropdown::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
+.translate-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 13px; color: var(--text-muted); transition: all 0.2s ease; border: none; background: none; width: 100%; text-align: left; font-family: 'Inter', sans-serif; }
+.translate-option:hover { background: rgba(108,92,231,0.1); color: var(--text); }
+.translate-option.active { background: rgba(108,92,231,0.15); color: var(--primary-light); }
+.translate-option-flag { font-size: 18px; line-height: 1; }
+
+.translate-badge { position: fixed; top: 80px; right: 30px; display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: var(--dark-card); border: 1px solid rgba(108,92,231,0.3); border-radius: 14px; font-size: 13px; color: var(--text); z-index: 999; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 320px; opacity: 0; transform: translateX(30px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.translate-badge.visible { opacity: 1; transform: translateX(0); }
+.translate-badge-icon { font-size: 20px; flex-shrink: 0; }
+.translate-badge-text { line-height: 1.4; }
+.translate-badge-text strong { color: var(--primary-light); }
+.translate-badge-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px; line-height: 1; transition: color 0.2s ease; }
+.translate-badge-close:hover { color: var(--text); }
+
+@media (max-width: 900px) {
+  .navbar { padding: 16px 24px; }
+  .navbar.scrolled { padding: 12px 24px; }
+  .nav-links { display: none; }
+  .section-padding { padding: 80px 24px; }
+  .hero { padding: 0 24px; }
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-float-card { display: none; }
+  .project-card { grid-template-columns: 1fr; gap: 32px; }
+  .project-card:nth-child(even) { direction: ltr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .timeline-item:nth-child(odd), .timeline-item:nth-child(even) { padding: 0 0 0 calc(50% + 30px); text-align: left; justify-content: flex-start; }
+  .timeline-line { left: 20px; }
+  .timeline-dot { left: 20px; }
+  .footer-inner { flex-direction: column; gap: 24px; text-align: center; }
+  .translate-badge { right: 16px; top: 70px; max-width: 260px; font-size: 12px; }
+  .translate-dropdown { right: -20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="preloader" id="preloader">
+  <div class="preloader-ring"></div>
+  <div class="preloader-text" data-i18n="loading">Loading</div>
+</div>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo">wildn<span></span></a>
+  <ul class="nav-links">
+    <li><a href="#about" data-i18n="nav_about">About</a></li>
+    <li><a href="#skills" data-i18n="nav_skills">Skills</a></li>
+    <li><a href="#projects" data-i18n="nav_projects">Projects</a></li>
+    <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+  </ul>
+  <div class="translate-wrapper" id="translateWrapper">
+    <button class="translate-toggle" id="translateToggle">
+      <span class="translate-toggle-icon">&#127760;</span>
+      <span class="translate-toggle-label" data-i18n="lang_name">English</span>
+      <span class="translate-toggle-arrow">&#9662;</span>
+    </button>
+    <div class="translate-dropdown" id="translateDropdown"></div>
+  </div>
+</nav>
+
+<div class="translate-badge" id="translateBadge">
+  <span class="translate-badge-icon">&#127760;</span>
+  <span class="translate-badge-text" data-i18n="badge_text">This site can be <strong>translated</strong> to your language!</span>
+  <button class="translate-badge-close" id="translateBadgeClose">&times;</button>
+</div>
+
+<section class="hero" id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-orbs">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <div class="hero-tag-dot"></div>
+      <span data-i18n="hero_tag">Available for freelance work</span>
+    </div>
+    <h1 class="hero-name">
+      <span data-i18n="hero_title_1">Ready to make</span> <span class="gradient-text" data-i18n="hero_title_2">your website</span>
+    </h1>
+    <p class="hero-desc" data-i18n="hero_desc">A passionate developer eager to build clean, modern websites that help you stand out. Let's create something great together.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">
+        <span data-i18n="hero_btn_work">View My Work</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7.8H7.8"/></svg>
+      </a>
+      <a href="#contact" class="btn btn-ghost">
+        <span data-i18n="hero_btn_touch">Get In Touch</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-banner">
+  <div class="marquee-track">
+    <div class="marquee-item"><span></span>HTML</div>
+    <div class="marquee-item"><span></span>CSS</div>
+    <div class="marquee-item"><span></span>JavaScript</div>
+    <div class="marquee-item"><span></span>Python</div>
+    <div class="marquee-item"><span></span>UI/UX Design</div>
+    <div class="marquee-item"><span></span>HTML</div>
+    <div class="marquee-item"><span></span>CSS</div>
+    <div class="marquee-item"><span></span>JavaScript</div>
+    <div class="marquee-item"><span></span>Python</div>
+    <div class="marquee-item"><span></span>UI/UX Design</div>
+    <div class="marquee-item"><span></span>HTML</div>
+    <div class="marquee-item"><span></span>CSS</div>
+    <div class="marquee-item"><span></span>JavaScript</div>
+    <div class="marquee-item"><span></span>Python</div>
+    <div class="marquee-item"><span></span>UI/UX Design</div>
+  </div>
+</div>
+
+<section class="about section-padding" id="about">
+  <div class="about-grid">
+    <div class="about-image-wrapper reveal-left">
+      <div class="about-image">
+        <img src="WM(I).jpeg" alt="Wildn" style="width:100%;height:100%;object-fit:cover;display:block;">
+      </div>
+      <div class="about-image-border"></div>
+      <div class="about-float-card card-1 reveal-scale">
+        <div class="about-float-number">3+</div>
+        <div class="about-float-label" data-i18n="about_exp">Years Learning</div>
+      </div>
+      <div class="about-float-card card-2 reveal-scale">
+        <div class="about-float-number">3+</div>
+        <div class="about-float-label" data-i18n="about_projects_done">Projects Built</div>
+      </div>
+    </div>
+    <div class="about-content reveal-right">
+      <div class="section-label" data-i18n="about_label">About Me</div>
+      <h2 class="section-title" data-i18n="about_title">I'm ready to build<br>your next website</h2>
+      <p data-i18n="about_p1">I'm a developer who loves turning ideas into real websites. I focus on making things clean, fast, and easy to use.</p>
+      <p data-i18n="about_p2">When I'm not coding, I'm usually learning new tools, experimenting with side projects, or helping others get started in tech.</p>
+      <div class="about-stats">
+        <div class="about-stat">
+          <div class="about-stat-number" data-count="3">0</div>
+          <div class="about-stat-label" data-i18n="stat_projects">Projects</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-number" data-count="5">0</div>
+          <div class="about-stat-label" data-i18n="stat_clients">Clients</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-number" data-count="100">0</div>
+          <div class="about-stat-label" data-i18n="stat_happy">Happy %</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="skills section-padding" id="skills">
+  <div class="skills-container">
+    <div class="skills-header reveal">
+      <div class="section-label" style="justify-content:center;" data-i18n="skills_label">My Skills</div>
+      <h2 class="section-title" data-i18n="skills_title">Technologies I work with</h2>
+      <p class="section-subtitle" style="margin:0 auto;" data-i18n="skills_subtitle">A curated set of tools and technologies I use to bring ideas to life.</p>
+    </div>
+    <div class="skills-categories reveal">
+      <button class="skill-cat-btn active" data-filter="all" data-i18n="cat_all">All</button>
+      <button class="skill-cat-btn" data-filter="frontend">Frontend</button>
+      <button class="skill-cat-btn" data-filter="backend">Backend</button>
+      <button class="skill-cat-btn" data-filter="design">Design</button>
+    </div>
+    <div class="skills-grid stagger" id="skillsGrid">
+      <div class="skill-card reveal" data-category="frontend" style="--i:0">
+        <div class="skill-icon icon-orange">&#60;/&#62;</div>
+        <h3>HTML</h3>
+        <p data-i18n="skill_react">Writing clean, semantic markup that structures the web.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>90%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="90"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="frontend" style="--i:1">
+        <div class="skill-icon icon-blue">&#127912;</div>
+        <h3>CSS</h3>
+        <p data-i18n="skill_ts">Crafting responsive layouts and beautiful visual designs from scratch.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>85%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="85"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="frontend" style="--i:2">
+        <div class="skill-icon icon-yellow">&#9889;</div>
+        <h3>JavaScript</h3>
+        <p data-i18n="skill_tw">Bringing websites to life with interactivity and dynamic content.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>80%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="80"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="backend" style="--i:3">
+        <div class="skill-icon icon-green">&#128013;</div>
+        <h3>Python</h3>
+        <p data-i18n="skill_py">Automation, data tasks, and backend scripting with Python.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>75%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="75"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="backend" style="--i:4">
+        <div class="skill-icon icon-purple">&#128268;</div>
+        <h3>PHP</h3>
+        <p data-i18n="skill_node">Server-side scripting for dynamic web pages and form handling.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>50%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="50"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="backend" style="--i:5">
+        <div class="skill-icon icon-teal">&#128202;</div>
+        <h3>MySQL</h3>
+        <p data-i18n="skill_pg">Organizing and querying data for web applications.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>55%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="55"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal" data-category="design" style="--i:6">
+        <div class="skill-icon icon-pink">&#10024;</div>
+        <h3>Figma</h3>
+        <p data-i18n="skill_figma">Designing clean layouts and prototyping before building.</p>
+        <div class="skill-bar-wrapper">
+          <div class="skill-bar-header"><span data-i18n="proficiency">Proficiency</span><span>70%</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" data-width="70"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="projects section-padding" id="projects">
+  <div class="projects-container">
+    <div class="projects-header reveal">
+      <div class="section-label" style="justify-content:center;" data-i18n="projects_label">Featured Work</div>
+      <h2 class="section-title" data-i18n="projects_title">Selected projects</h2>
+      <p class="section-subtitle" style="margin:0 auto;" data-i18n="projects_subtitle">A showcase of projects I've designed and built from concept to deployment.</p>
+    </div>
+    <div class="project-card">
+      <div class="project-preview reveal-left"><div class="project-preview-inner"><div class="project-preview-bg bg-1"></div><div class="project-preview-content"><div class="project-preview-icon">🚗</div><div class="project-preview-label" data-i18n="proj1_label">Travel Agency Platform</div></div></div></div>
+      <div class="project-info reveal-right">
+        <div class="project-number">01</div>
+        <h3>TravelBuddy</h3>
+        <p data-i18n="proj1_desc">A website that helps travelers plan and book their trips with ease.</p>
+        <div class="project-tags"><span class="project-tag">HTML</span><span class="project-tag">CSS</span><span class="project-tag">Javascript</span></div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-preview reveal-right"><div class="project-preview-inner"><div class="project-preview-bg bg-2"></div><div class="project-preview-content"><div class="project-preview-icon">🏫</div><div class="project-preview-label" data-i18n="proj2_label">School Submission Portal</div></div></div></div>
+      <div class="project-info reveal-left">
+        <div class="project-number">02</div>
+        <h3>ClassTask</h3>
+        <p data-i18n="proj2_desc">A task management platform for educators to create, assign, and track student assignments.</p>
+        <div class="project-tags"><span class="project-tag">HTML</span><span class="project-tag">CSS</span><span class="project-tag">Javascript</span></div>
+        <div class="project-links"><a href="https://classtask-wm44.web.app" class="project-link project-link-primary"><span data-i18n="live_demo">Live Demo</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V7.8H7.8"/></svg></a></div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-preview reveal-left"><div class="project-preview-inner"><div class="project-preview-bg bg-3"></div><div class="project-preview-content"><div class="project-preview-icon">🎮</div><div class="project-preview-label" data-i18n="proj3_label">AI Chatbot</div></div></div></div>
+      <div class="project-info reveal-right">
+        <div class="project-number">03</div>
+        <h3>Brawl Stars Challenge ME (W.I.P)</h3>
+        <p data-i18n="proj3_desc">A fun and engaging challenge platform for Brawl Stars players to test their skills and compete with friends.</p>
+        <div class="project-tags"><span class="project-tag">HTML</span><span class="project-tag">CSS</span><span class="project-tag">Javascript</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="contact section-padding" id="contact">
+  <div class="contact-container">
+    <div class="contact-header reveal">
+      <div class="section-label" style="justify-content:center;" data-i18n="contact_label">Get In Touch</div>
+      <h2 class="section-title" data-i18n="contact_title">Let's work together</h2>
+      <p class="section-subtitle" style="margin:0 auto;" data-i18n="contact_subtitle">Have a project in mind? I'd love to hear about it. Drop me a message and let's create something amazing.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-methods reveal-left">
+        <a href="mailto:superdanimubarok@gmail.com" class="contact-method">
+          <div class="contact-method-icon icon-purple" style="background:rgba(108,92,231,0.15);">&#9993;</div>
+          <div><div class="contact-method-label">Email</div><div class="contact-method-value">superdanimubarok@gmail.com</div></div>
+        </a>
+        <div class="contact-method">
+          <div class="contact-method-icon icon-teal" style="background:rgba(0,206,201,0.15);">&#128172;</div>
+          <div><div class="contact-method-label" data-i18n="availability">Availability</div><div class="contact-method-value" data-i18n="avail_value">Open to opportunities</div></div>
+        </div>
+        <div class="contact-method">
+          <div class="contact-method-icon icon-pink" style="background:rgba(253,121,168,0.15);">&#128205;</div>
+          <div><div class="contact-method-label" data-i18n="location">Location</div><div class="contact-method-value" data-i18n="loc_value">Remote / Worldwide</div></div>
+        </div>
+      </div>
+      <form class="contact-form reveal-right" id="contactForm">
+        <div class="form-group"><input type="text" name="name" data-i18n-placeholder="placeholder_name" placeholder="Your Name" required></div>
+        <div class="form-group"><input type="email" name="from_email" data-i18n-placeholder="placeholder_email" placeholder="Your Email" required></div>
+        <div class="form-group"><textarea name="project_details" data-i18n-placeholder="placeholder_project" placeholder="Tell me about your project..."></textarea></div>
+        <button type="submit" class="btn btn-primary">
+          <span data-i18n="send_msg">Send Message</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-text" data-i18n="footer">&copy; 2026 Wildn. Crafted with care.</div>
+    <div class="footer-socials">
+      <a href="https://github.com/Wild-Warrior" class="footer-social" title="GitHub" target="_blank">&#9733;</a>
+      <a href="https://www.instagram.com/light_willsplash" class="footer-social" title="Instagram" target="_blank">&#9679;</a>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop">&#8593;</button>
+
+<script>
+// ─── I18N TRANSLATIONS ───
+var translations = {
+  en: {
+    lang_name: "English", loading: "Loading", badge_text: 'This site can be <strong>translated</strong> to your language!',
+    nav_about: "About", nav_skills: "Skills", nav_projects: "Projects", nav_contact: "Contact",
+    hero_tag: "Available for freelance work",     hero_title_1: "Ready to make", hero_title_2: "your website", hero_title_3: "come alive",
+    hero_desc: "A passionate developer eager to build clean, modern websites that help you stand out. Let's create something great together.",
+    hero_btn_work: "View My Work", hero_btn_touch: "Get In Touch", hero_scroll: "scroll",
+    about_label: "About Me",     about_title: "I'm ready to build<br>your next website", about_exp: "Years Learning", about_projects_done: "Projects Built",
+    about_p1: "I'm a developer who loves turning ideas into real websites. I focus on making things clean, fast, and easy to use.",
+    about_p2: "When I'm not coding, I'm usually learning new tools, experimenting with side projects, or helping others get started in tech.",
+    stat_projects: "Projects", stat_clients: "Clients", stat_happy: "Happy %",
+    skills_label: "My Skills", skills_title: "Technologies I work with", skills_subtitle: "A curated set of tools and technologies I use to bring ideas to life.",
+    cat_all: "All", proficiency: "Proficiency",
+    skill_react: "Writing clean, semantic markup that structures the web.",
+    skill_ts: "Crafting responsive layouts and beautiful visual designs from scratch.",
+    skill_tw: "Bringing websites to life with interactivity and dynamic content.",
+    skill_node: "Server-side scripting for dynamic web pages and form handling.",
+    skill_py: "Automation, data tasks, and backend scripting with Python.",
+    skill_pg: "Organizing and querying data for web applications.",
+    skill_figma: "Designing clean layouts and prototyping before building.",
+    projects_label: "Featured Work", projects_title: "Selected projects", projects_subtitle: "A showcase of projects I've designed and built from concept to deployment.",
+    proj1_label: "Travel Agency Platform", proj1_desc: "A website that helps travelers plan and book their trips with ease.",
+    proj2_label: "School Submission Portal", proj2_desc: "A task management platform for educators to create, assign, and track student assignments.",
+    proj3_label: "Brawl Stars Challenge", proj3_desc: "A fun and engaging challenge platform for Brawl Stars players to test their skills and compete with friends.",
+    live_demo: "Live Demo", source_code: "Source Code",
+    test_label: "Testimonials", test_title: "What people say",
+    test1: "An exceptional developer who consistently delivers high-quality work. Their attention to detail and problem-solving skills are outstanding.",
+    test2: "Transformed our vision into a beautiful, functional product. The collaboration was seamless and the results exceeded expectations.",
+    test3: "One of the most talented developers I've worked with. They bring both technical expertise and creative thinking to every project.",
+    contact_label: "Get In Touch", contact_title: "Let's work together", contact_subtitle: "Have a project in mind? I'd love to hear about it. Drop me a message and let's create something amazing.",
+    availability: "Availability", avail_value: "Open to opportunities", location: "Location", loc_value: "Remote / Worldwide",
+    placeholder_name: "Your Name", placeholder_email: "Your Email", placeholder_project: "Tell me about your project...", send_msg: "Send Message",
+    footer: "&copy; 2026 Wildn. Crafted with care."
+  },
+  id: {
+    lang_name: "Indonesian", loading: "Memuat", badge_text: 'Situs ini bisa <strong>diterjemahkan</strong> ke bahasa Anda!',
+    nav_about: "Tentang", nav_skills: "Keahlian", nav_projects: "Proyek", nav_contact: "Kontak",
+    hero_tag: "Tersedia untuk pekerjaan freelance", hero_title_1: "Siap membuat", hero_title_2: "website", hero_title_3: "Anda jadi nyata",
+    hero_desc: "Seorang pengembang yang antusias membangun website bersih dan modern yang membantu Anda menonjol. Mari ciptakan sesuatu yang hebat bersama.",
+    hero_btn_work: "Lihat Karya Saya", hero_btn_touch: "Hubungi Saya", hero_scroll: "gulir",
+    about_label: "Tentang Saya", about_title: "Siap membangun<br>website Anda berikutnya", about_exp: "Tahun Belajar", about_projects_done: "Proyek Dibuat",
+    about_p1: "Saya pengembang yang suka mengubah ide menjadi website nyata. Saya fokus membuat yang bersih, cepat, dan mudah digunakan.",
+    about_p2: "Ketika tidak coding, saya biasanya belajar alat baru, bereksperimen proyek sampingan, atau membantu orang lain mulai di tech.",
+    stat_projects: "Proyek", stat_clients: "Klien", stat_happy: "Puas %",
+    skills_label: "Keahlian Saya", skills_title: "Teknologi yang saya gunakan", skills_subtitle: "Kumpulan alat dan teknologi yang saya gunakan untuk mewujudkan ide.",
+    cat_all: "Semua", proficiency: "Kemahiran",
+    skill_react: "Menulis markup yang bersih dan semantik yang membangun struktur web.",
+    skill_ts: "Membuat tata letak responsif dan desain visual yang indah dari awal.",
+    skill_tw: "Menghidupkan website dengan interaktivitas dan konten dinamis.",
+    skill_node: "Scripting sisi server untuk halaman web dinamis dan penanganan form.",
+    skill_py: "Otomasi, tugas data, dan scripting backend dengan Python.",
+    skill_pg: "Mengorganisir dan mengkueri data untuk aplikasi web.",
+    skill_figma: "Mendesain tata letak yang bersih dan membuat prototipe sebelum membangun.",
+    projects_label: "Karya Unggulan", projects_title: "Proyek pilihan", projects_subtitle: "Tampilan proyek yang telah saya rancang dan bangun dari konsep hingga deployment.",
+    proj1_label: "Platform Agen Perjalanan", proj1_desc: "Sebuah website yang membantu wisatawan merencanakan dan memesan perjalanan mereka dengan mudah.",
+    proj2_label: "Portal Tugas Sekolah", proj2_desc: "Platform manajemen tugas untuk pendidik membuat, menugaskan, dan melacak tugas siswa.",
+    proj3_label: "Tantangan Brawl Stars", proj3_desc: "Platform tantangan yang menyenangkan dan menarik untuk pemain Brawl Stars menguji keterampilan dan bersaing dengan teman.",
+    live_demo: "Demo Langsung", source_code: "Kode Sumber",
+    test_label: "Testimoni", test_title: "Apa kata orang",
+    test1: "Pengembang luar biasa yang secara konsisten memberikan pekerjaan berkualitas tinggi. Perhatian terhadap detail dan keterampilan pemecahan masalahnya sangat menonjol.",
+    test2: "Mengubah visi kami menjadi produk yang indah dan fungsional. Kolaborasinya berjalan lancar dan hasilnya melebihi ekspektasi.",
+    test3: "Sal satu pengembang paling berbakat yang pernah saya ajak bekerja. Mereka membawa keahlian teknis dan pemikiran kreatif di setiap proyek.",
+    contact_label: "Hubungi Saya", contact_title: "Mari bekerja sama", contact_subtitle: "Ada proyek yang ingin dibicarakan? Saya ingin mendengarnya. Kirim pesan dan mari ciptakan sesuatu yang luar biasa.",
+    availability: "Ketersediaan", avail_value: "Terbuka untuk peluang", location: "Lokasi", loc_value: "Remote / Seluruh Dunia",
+    placeholder_name: "Nama Anda", placeholder_email: "Email Anda", placeholder_project: "Ceritakan tentang proyek Anda...", send_msg: "Kirim Pesan",
+    footer: "&copy; 2026 Wildn. Dibuat dengan penuh perhatian."
+  },
+  ja: {
+    lang_name: "Japanese", loading: "読み込み中", badge_text: "このサイトは翻訳できます！",
+    nav_about: "概要", nav_skills: "スキル", nav_projects: "プロジェクト", nav_contact: "連絡先",
+    hero_tag: "フリーランスのお仕事受付中", hero_title_1: "あなたのウェブサイトを", hero_title_2: "作ります", hero_title_3: "一緒に",
+    hero_desc: "クリーンでモダンなウェブサイトを構築したい情熱のある開発者です。一緒に素晴らしいものを作りましょう。",
+    hero_btn_work: "作品を見る", hero_btn_touch: "お問い合わせ", hero_scroll: "スクロール",
+    about_label: "自己紹介", about_title: "次のウェブサイトを<br>構築します", about_exp: "学習年数", about_projects_done: "制作プロジェクト",
+    about_p1: "アイデアを実際のウェブサイトに変えるのが好きな開発者です。クリーンで速く、使いやすいものを作ることに焦点を当てています。",
+    about_p2: "コーディングしていない時は、新しいツールを学んだり、サイドプロジェクトを試したり、テックを始める人を手伝ったりしています。",
+    stat_projects: "プロジェクト", stat_clients: "クライアント", stat_happy: "満足度 %",
+    skills_label: "我的スキル", skills_title: "使用技術", skills_subtitle: "アイデアを形にするために使用するツールとテクノロジーのセットです。",
+    cat_all: "すべて", proficiency: "熟練度",
+    skill_react: "ウェブの構造を作るクリーンで意味のあるマークアップを書く。",
+    skill_ts: "ゼロからレスポンシブなレイアウトと美しいビジュアルデザインを構築。",
+    skill_tw: "インタラクティブ性和動的コンテンツでウェブサイトに命を吹き込む。",
+    skill_node: "動的ウェブページとフォーム処理のためのサーバーサイドスクリプティング。",
+    skill_py: "Pythonによる自動化、データタスク、バックエンドスクリプティング。",
+    skill_pg: "ウェブアプリケーションのデータの整理とクエリ。",
+    skill_figma: "ビルド前にクリーンなレイアウトをデザインしプロトタイプ作成。",
+    projects_label: "注目の作品", projects_title: "選りすぐりのプロジェクト", projects_subtitle: "コンセプトからデプロイまで設計・構築したプロジェクトのショーケース。",
+    proj1_label: "旅行代理店プラットフォーム", proj1_desc: "旅行者が旅行を簡単に計画・予約できるウェブサイト。",
+    proj2_label: "学校提出ポータル", proj2_desc: "教育者が生徒の課題を作成、割り当て、追跡できるタスク管理プラットフォーム。",
+    proj3_label: "ブロスタチャレンジ", proj3_desc: "ブロスタのプレイヤーがスキルをテストし、友達と競い合える楽しいチャレンジプラットフォーム。",
+    live_demo: "ライブデモ", source_code: "ソースコード",
+    test_label: "お客様の声", test_title: "お客様の評価",
+    test1: "一貫して高品質な仕事を提供する卓越した開発者。細部へのこだわりと問題解決スキルは素晴らしい。",
+    test2: "私たちのビジョンを美丽で機能的なプロダクトに変革。コラボレーションはシームレスで、結果は期待を上回った。",
+    test3: "一緒に仕事をした中で最も才能ある開発者の一人。技術的専門知識とクリエイティブな思考をすべてのプロジェクトにbringしている。",
+    contact_label: "お問い合わせ", contact_title: "一緒に働きましょう", contact_subtitle: "プロジェクトについてのご相談があればお気軽にメッセージをお送りください。素晴らしいものを作りましょう。",
+    availability: "対応可能", avail_value: "新しい機会を歓迎", location: "場所", loc_value: "リモート / 世界中",
+    placeholder_name: "お名前", placeholder_email: "メールアドレス", placeholder_project: "プロジェクトについて教えてください...", send_msg: "メッセージを送信",
+    footer: "&copy; 2026 Wildn. 心を込めて制作。"
+  },
+  ko: {
+    lang_name: "Korean", loading: "로딩 중", badge_text: "이 사이트는 번역이 가능합니다!",
+    nav_about: "소개", nav_skills: "기술", nav_projects: "프로젝트", nav_contact: "연락처",
+    hero_tag: "프리랜스 작업 가능", hero_title_1: "당신의 웹사이트를", hero_title_2: "만들 준비가", hero_title_3: "되었습니다",
+    hero_desc: "깔끔하고 모던한 웹사이트를 만들고 싶어하는 열정적인 개발자입니다. 함께 멋진 것을 만들어 봅시다.",
+    hero_btn_work: "작업 보기", hero_btn_touch: "연락하기", hero_scroll: "스크롤",
+    about_label: "소개", about_title: "다음 웹사이트를<br>구축할 준비가 되었습니다", about_exp: "학습 년수", about_projects_done: "제작 프로젝트",
+    about_p1: "아이디어를 실제 웹사이트로 바꾸는 것을 좋아하는 개발자입니다. 깨끗하고 빠르며 사용하기 쉬운 것에 집중합니다.",
+    about_p2: "코딩하지 않을 때는 새로운 도구를 배우거나, 사이드 프로젝트를 시도하거나, 테크 분야를 시작하는 사람들을 돕고 있습니다.",
+    stat_projects: "프로젝트", stat_clients: "고객", stat_happy: "만족도 %",
+    skills_label: "나의 기술", skills_title: "사용하는 기술", skills_subtitle: "아이디어를 실현하기 위해 사용하는 도구와 기술 모음입니다.",
+    cat_all: "전체", proficiency: "숙련도",
+    skill_react: "웹의 구조를 만드는 깨끗하고 의미 있는 마크업을 작성합니다.",
+    skill_ts: "처음부터 반응식 레이아웃과 아름다운 비주얼 디자인을 만듭니다.",
+    skill_tw: "인터랙티브性和 동적 콘텐츠로 웹사이트에 생명을 불어넣습니다.",
+    skill_node: "동적 웹 페이지와 폼 처리를 위한 서버 사이드 스크립팅.",
+    skill_py: "Python을 사용한 자동화, 데이터 작업, 백엔드 스크립팅.",
+    skill_pg: "웹 애플리케이션을 위한 데이터 정리와 쿼리.",
+    skill_figma: "빌드 전에 깔끔한 레이아웃을 디자인하고 프로토타이핑합니다.",
+    projects_label: "주요 작업", projects_title: "선별된 프로젝트", projects_subtitle: "컨셉부터 배포까지 설계하고 구축한 프로젝트 쇼케이스.",
+    proj1_label: "여행사 플랫폼", proj1_desc: "여행자가 여행을 쉽게 계획하고 예약할 수 있는 웹사이트.",
+    proj2_label: "학교 제출 포털", proj2_desc: "교육자가 학생 과제를 만들고, 할당하고, 추적할 수 있는 과제 관리 플랫폼.",
+    proj3_label: "브롤스타즈 챌린지", proj3_desc: "브롤스타즈 플레이어가 스킬을 테스트하고 친구와 경쟁할 수 있는 재미있는 챌린지 플랫폼.",
+    live_demo: "라이브 데모", source_code: "소스 코드",
+    test_label: "후기", test_title: "고객들의 평가",
+    test1: "일관되게 고품질 작업을 제공하는 뛰어난 개발자. 세심한 관심과 문제 해결 기술이 뛰어납니다.",
+    test2: "우리의 비전을 아름답고 기능적인 제품으로 변환. 협업이 원활했고 결과가 기대를 초과했습니다.",
+    test3: "함께 일한 개발자 중 가장 재능 있는 개발자 중 한 명.",
+    contact_label: "연락하기", contact_title: "함께 일합시다", contact_subtitle: "프로젝트에 대해 이야기하고 싶으시다면 메시지를 보내주세요.",
+    availability: "가용성", avail_value: "새로운 기회 환영", location: "위치", loc_value: "원격 / 전 세계",
+    placeholder_name: "이름", placeholder_email: "이메일", placeholder_project: "프로젝트에 대해 알려주세요...", send_msg: "메시지 보내기",
+    footer: "&copy; 2026 Wildn. 정성껏 제작."
+  },
+  "zh-CN": {
+    lang_name: "Chinese", loading: "加载中", badge_text: "本网站可以翻译成您的语言！",
+    nav_about: "关于", nav_skills: "技能", nav_projects: "项目", nav_contact: "联系",
+    hero_tag: "接受自由职业", hero_title_1: "准备好打造", hero_title_2: "你的网站", hero_title_3: "让它上线",
+    hero_desc: "一个充满热情的开发者，渴望建造简洁、现代的网站，帮助你脱颖而出。让我们一起创造一些美好的东西。",
+    hero_btn_work: "查看作品", hero_btn_touch: "联系我", hero_scroll: "滚动",
+    about_label: "关于我", about_title: "准备好构建<br>你的下一个网站", about_exp: "学习年数", about_projects_done: "制作项目",
+    about_p1: "我是一个喜欢把想法变成真实网站的开发者。我专注于让事情变得干净、快速、易于使用。",
+    about_p2: "不写代码的时候，我通常在学习新工具、尝试副项目，或者帮助别人入门科技。",
+    stat_projects: "项目", stat_clients: "客户", stat_happy: "满意度 %",
+    skills_label: "我的技能", skills_title: "使用的技术", skills_subtitle: "我用来实现创意的精选工具和技术。",
+    cat_all: "全部", proficiency: "熟练度",
+    skill_react: "编写干净、有语义的标记来构建网页结构。",
+    skill_ts: "从零开始打造响应式布局和精美的视觉设计。",
+    skill_tw: "用交互性和动态内容让网站活起来。",
+    skill_node: "用于动态网页和表单处理的服务器端脚本。",
+    skill_py: "用Python进行自动化、数据任务和后端脚本。",
+    skill_pg: "为Web应用整理和查询数据。",
+    skill_figma: "在构建之前设计整洁的布局并制作原型。",
+    projects_label: "精选作品", projects_title: "精选项目", projects_subtitle: "展示我从概念到部署设计和构建的项目。",
+    proj1_label: "旅行社平台", proj1_desc: "一个帮助旅行者轻松规划和预订旅行的网站。",
+    proj2_label: "学校提交门户", proj2_desc: "一个教育者创建、分配和跟踪学生作业的任务管理平台。",
+    proj3_label: "荒野乱斗挑战", proj3_desc: "一个有趣且引人入胜的挑战平台，让荒野乱斗玩家测试技能并与朋友竞争。",
+    live_demo: "在线演示", source_code: "源代码",
+    test_label: "客户评价", test_title: "客户评价",
+    test1: "一位持续交付高质量工作的杰出开发者。对细节的关注和解决问题的能力非常出色。",
+    test2: "将我们的愿景转变为美丽、实用的产品。合作无缝，结果超出了预期。",
+    test3: "与我合作过的最有才华的开发者之一。",
+    contact_label: "联系我", contact_title: "一起合作", contact_subtitle: "有项目想法？我很想听听。给我发消息，让我们一起创造一些了不起的东西。",
+    availability: "可用性", avail_value: "接受新机会", location: "位置", loc_value: "远程 / 全球",
+    placeholder_name: "您的姓名", placeholder_email: "您的邮箱", placeholder_project: "告诉我关于您的项目...", send_msg: "发送消息",
+    footer: "&copy; 2026 Wildn. 用心制作。"
+  },
+  ar: {
+    lang_name: "Arabic", loading: "جاري التحميل", badge_text: "يمكن ترجمة هذا الموقع إلى لغتك!",
+    nav_about: "حول", nav_skills: "المهارات", nav_projects: "المشاريع", nav_contact: "التواصل",
+    hero_tag: "متاح للعمل الحر", hero_title_1: "جاهز لبناء", hero_title_2: "موقعك", hero_title_3: "وإحيائه",
+    hero_desc: "مطور شغوف ببناء مواقع ويب نظيفة وعصرية تساعدك على التميز. دعنا ننشئ شيئاً رائعاً معاً.",
+    hero_btn_work: "عرض أعمالي", hero_btn_touch: "تواصل معي", hero_scroll: "تمرير",
+    about_label: "عني", about_title: "جاهز لبناء<br>موقعك التالي", about_exp: "سنوات التعلم", about_projects_done: "مشاريع منشأة",
+    about_p1: "أنا مطور يحب تحويل الأفكار إلى مواقع ويب حقيقية. أركز على جعل الأشياء نظيفة وسريعة وسهلة الاستخدام.",
+    about_p2: "عندما لا أكون أكتب كوداً، عادة ما أتعلم أدوات جديدة أو أجرب مشاريع جانبية أو أساعد الآخرين على البدء في التقنية.",
+    stat_projects: "مشاريع", stat_clients: "عملاء", stat_happy: "نسبة الرضا %",
+    skills_label: "مهاراتي", skills_title: "التقنيات التي أعمل بها", skills_subtitle: "مجموعة مختارة من الأدوات والتقنيات التي أستخدمها لتحويل الأفكار إلى واقع.",
+    cat_all: "الكل", proficiency: "الإتقان",
+    skill_react: "كتابة علامات نظيفة ودلالية تبني هيكل الويب.",
+    skill_tw: "إنشاء تخطيطات متجاوبة وتصاميم بصرية جميلة من الصفر.",
+    skill_ts: "إحياء مواقع الويب بالتفاعلية والمحتوى الديناميكي.",
+    skill_node: "البرمجة النصية من جانب الخادم لصفحات الويب الديناميكية ومعالجة النماذج.",
+    skill_py: "الأتمتة ومهام البيانات والبرمجة النصية من جانب الخادم باستخدام Python.",
+    skill_pg: "تنظيم البيانات واستعلامها لتطبيقات الويب.",
+    skill_figma: "تصميم تخطيطات نظيفة وعمل نماذج أولية قبل البناء.",
+    projects_label: "أعمال مميزة", projects_title: "مشاريع مختارة", projects_subtitle: "عرض للمشاريع التي صممتها وبنيتها من المفهوم إلى النشر.",
+    proj1_label: "منصة وكالة سفر", proj1_desc: "موقع ويب يساعد المسافرين على تخطيط وحجز رحلاتهم بسهولة.",
+    proj2_label: "بوابة تسليم المدرسة", proj2_desc: "منصة إدارة المهام للمعلمين لإنشاء وتتبع واجبات الطلاب.",
+    proj3_label: "تحدي براول ستارز", proj3_desc: "منصة تحدي ممتعة وجذابة للاعبين براول ستارز لاختبار مهاراتهم والتنافس مع الأصدقاء.",
+    live_demo: "عرض مباشر", source_code: "الكود المصدري",
+    test_label: "شهادات", test_title: "ماذا يقول الناس",
+    test1: "مطور استثنائي يقدم عملاً عالي الجودة باستمرار.",
+    test2: "حول رؤيتنا إلى منتج جميل وعملي. كان التعاون سلساً والنتائج فاقت التوقعات.",
+    test3: "واحد من أكثر المطورين موهبة عملت معهم.",
+    contact_label: "تواصل معي", contact_title: "لنعمل معاً", contact_subtitle: "لديك مشروع في ذهنك؟ يسعدني سماعه. أرسل لي رسالة.",
+    availability: "التوفر", avail_value: "متاح للفرص", location: "الموقع", loc_value: "عن بُعد / في جميع أنحاء العالم",
+    placeholder_name: "اسمك", placeholder_email: "بريدك الإلكتروني", placeholder_project: "أخبرني عن مشروعك...", send_msg: "إرسال رسالة",
+    footer: "&copy; 2026 Wildn. صُنع بعناية."
+  },
+  es: {
+    lang_name: "Spanish", loading: "Cargando", badge_text: "Este sitio se puede traducir a tu idioma!",
+    nav_about: "Acerca de", nav_skills: "Habilidades", nav_projects: "Proyectos", nav_contact: "Contacto",
+    hero_tag: "Disponible para freelance", hero_title_1: "Listo para crear", hero_title_2: "tu sitio web", hero_title_3: "y darle vida",
+    hero_desc: "Un desarrollador apasionado por construir sitios web limpios y modernos que te ayuden a destacar. Creemos algo genial juntos.",
+    hero_btn_work: "Ver mi trabajo", hero_btn_touch: "Contáctame", hero_scroll: "desplazar",
+    about_label: "Sobre mí", about_title: "Listo para construir<br>tu siguiente sitio web", about_exp: "Años aprendiendo", about_projects_done: "Proyectos creados",
+    about_p1: "Soy un desarrollador que ama convertir ideas en sitios web reales. Me enfoco en hacer las cosas limpias, rápidas y fáciles de usar.",
+    about_p2: "Cuando no estoy programando, suelo aprender nuevas herramientas, experimentar con proyectos personales o ayudar a otros a empezar en tech.",
+    stat_projects: "Proyectos", stat_clients: "Clientes", stat_happy: "Satisfacción %",
+    skills_label: "Mis habilidades", skills_title: "Tecnologías que utilizo", skills_subtitle: "Un conjunto seleccionado de herramientas y tecnologías que uso para dar vida a las ideas.",
+    cat_all: "Todos", proficiency: "Dominio",
+    skill_react: "Escribiendo markup limpio y semántico que estructura la web.",
+    skill_ts: "Creando diseños responsivos y diseños visuales hermosos desde cero.",
+    skill_tw: "Dando vida a los sitios web con interactividad y contenido dinámico.",
+    skill_node: "Scripting del lado del servidor para páginas web dinámicas y manejo de formularios.",
+    skill_py: "Automatización, tareas de datos y scripting backend con Python.",
+    skill_pg: "Organizando y consultando datos para aplicaciones web.",
+    skill_figma: "Diseñando diseños limpios y creando prototipos antes de construir.",
+    projects_label: "Trabajo destacado", projects_title: "Proyectos seleccionados", projects_subtitle: "Una muestra de proyectos que he diseñado y construido.",
+    proj1_label: "Plataforma de Agencia de Viajes", proj1_desc: "Un sitio web que ayuda a los viajeros a planificar y reservar sus viajes con facilidad.",
+    proj2_label: "Portal de Entregas Escolares", proj2_desc: "Una plataforma de gestión de tareas para educadores crear, asignar y rastrear tareas de estudiantes.",
+    proj3_label: "Desafío Brawl Stars", proj3_desc: "Una plataforma de desafíos divertida y atractiva para que los jugadores de Brawl Stars prueben sus habilidades y compitan con amigos.",
+    live_demo: "Demo en vivo", source_code: "Código fuente",
+    test_label: "Testimonios", test_title: "Lo que dicen",
+    test1: "Un desarrollador excepcional que entrega consistentemente trabajo de alta calidad.",
+    test2: "Transformó nuestra visión en un producto hermoso y funcional.",
+    test3: "Uno de los desarrolladores más talentosos con los que he trabajado.",
+    contact_label: "Contáctame", contact_title: "Trabajemos juntos", contact_subtitle: "¿Tienes un proyecto en mente? Envíame un mensaje.",
+    availability: "Disponibilidad", avail_value: "Abierto a oportunidades", location: "Ubicación", loc_value: "Remoto / Mundial",
+    placeholder_name: "Tu nombre", placeholder_email: "Tu correo", placeholder_project: "Cuéntame sobre tu proyecto...", send_msg: "Enviar mensaje",
+    footer: "&copy; 2026 Wildn. Hecho con dedicación."
+  },
+  fr: {
+    lang_name: "French", loading: "Chargement", badge_text: "Ce site peut être traduit dans votre langue!",
+    nav_about: "À propos", nav_skills: "Compétences", nav_projects: "Projets", nav_contact: "Contact",
+    hero_tag: "Disponible pour freelance", hero_title_1: "Prêt à créer", hero_title_2: "votre site web", hero_title_3: "et le vivifier",
+    hero_desc: "Un développeur passionné par la création de sites web propres et modernes qui vous aident à vous démarquer. Créons quelque chose de génial ensemble.",
+    hero_btn_work: "Voir mes projets", hero_btn_touch: "Me contacter", hero_scroll: "défiler",
+    about_label: "À propos", about_title: "Prêt à construire<br>votre prochain site web", about_exp: "Années d'apprentissage", about_projects_done: "Projets créés",
+    about_p1: "Je suis un développeur qui adore transformer des idées en vrais sites web. Je me concentre sur la propreté, la rapidité et la facilité d'utilisation.",
+    about_p2: "Quand je ne code pas, j'apprends généralement de nouveaux outils, j'expérimente des projets personnels ou j'aide les autres à se lancer dans la tech.",
+    stat_projects: "Projets", stat_clients: "Clients", stat_happy: "Satisfaction %",
+    skills_label: "Mes compétences", skills_title: "Technologies que j'utilise", skills_subtitle: "Un ensemble sélectionné d'outils et technologies que j'utilise pour donner vie aux idées.",
+    cat_all: "Tous", proficiency: "Maîtrise",
+    skill_react: "Écrire un code propre et sémantique qui structure le web.",
+    skill_ts: "Créer des mises en page réactives et de beaux designs visuels from scratch.",
+    skill_tw: "Donner vie aux sites web avec interactivité et contenu dynamique.",
+    skill_node: "Scripting côté serveur pour les pages web dynamiques et la gestion de formulaires.",
+    skill_py: "Automatisation, tâches de données et scripting backend avec Python.",
+    skill_pg: "Organiser et interroger les données pour les applications web.",
+    skill_figma: "Concevoir des mises en page propres et créer des prototypes avant de construire.",
+    projects_label: "Travaux en vedette", projects_title: "Projets sélectionnés", projects_subtitle: "Une vitrine de projets que j'ai conçus et construits.",
+    proj1_label: "Plateforme d'Agence de Voyage", proj1_desc: "Un site web qui aide les voyageurs à planifier et réserver leurs voyages facilement.",
+    proj2_label: "Portail de Soumission Scolaire", proj2_desc: "Une plateforme de gestion des tâches pour les éducateurs créer, assigner et suivre les devoirs des étudiants.",
+    proj3_label: "Défi Brawl Stars", proj3_desc: "Une plateforme de défis amusante et engageante pour les joueurs de Brawl Stars tester leurs compétitions et rivaliser avec des amis.",
+    live_demo: "Démo en direct", source_code: "Code source",
+    test_label: "Témoignages", test_title: "Ce que les gens disent",
+    test1: "Un développeur exceptionnel qui livre constamment un travail de haute qualité.",
+    test2: "A transformé notre vision en un produit beau et fonctionnel.",
+    test3: "L'un des développeurs les plus talentueux avec qui j'ai travaillé.",
+    contact_label: "Contactez-moi", contact_title: "Travaillons ensemble", contact_subtitle: "Vous avez un projet en tête? Envoyez-moi un message.",
+    availability: "Disponibilité", avail_value: "Ouvert aux opportunités", location: "Emplacement", loc_value: "À distance / Monde entier",
+    placeholder_name: "Votre nom", placeholder_email: "Votre email", placeholder_project: "Parlez-moi de votre projet...", send_msg: "Envoyer le message",
+    footer: "&copy; 2026 Wildn. Fait avec soin."
+  },
+  pt: {
+    lang_name: "Portuguese", loading: "Carregando", badge_text: "Este site pode ser traduzido para o seu idioma!",
+    nav_about: "Sobre", nav_skills: "Habilidades", nav_projects: "Projetos", nav_contact: "Contato",
+    hero_tag: "Disponível para freelance", hero_title_1: "Eu construo", hero_title_2: "experiências", hero_title_3: "digitais",
+    hero_desc: "Um desenvolvedor apaixonado por construir websites limpos e modernos que te ajudam a se destacar. Vamos criar algo incrível juntos.",
+    hero_btn_work: "Ver meu trabalho", hero_btn_touch: "Fale comigo", hero_scroll: "rolar",
+    about_label: "Sobre mim", about_title: "Pronto para construir<br>seu próximo site", about_exp: "Anos aprendendo", about_projects_done: "Projetos criados",
+    about_p1: "Sou um desenvolvedor que adora transformar ideias em websites reais. Foco em fazer as coisas limpas, rápidas e fáceis de usar.",
+    about_p2: "Quando não estou programando, geralmente estou aprendendo novas ferramentas, experimentando projetos paralelos ou ajudando outros a começar na área.",
+    stat_projects: "Projetos", stat_clients: "Clientes", stat_happy: "Satisfação %",
+    skills_label: "Minhas habilidades", skills_title: "Tecnologias que utilizo", skills_subtitle: "Um conjunto selecionado de ferramentas e tecnologias que uso para dar vida às ideias.",
+    cat_all: "Todos", proficiency: "Proficiência",
+    skill_react: "Escrevendo markup limpo e semântico que estrutura a web.",
+    skill_ts: "Criando layouts responsivos e designs visuais bonitos do zero.",
+    skill_tw: "Dando vida aos websites com interatividade e conteúdo dinâmico.",
+    skill_node: "Scripting do lado do servidor para páginas web dinâmicas e tratamento de formulários.",
+    skill_py: "Automação, tarefas de dados e scripting backend com Python.",
+    skill_pg: "Organizando e consultando dados para aplicações web.",
+    skill_figma: "Projetando layouts limpos e criando protótipos antes de construir.",
+    projects_label: "Trabalho em destaque", projects_title: "Projetos selecionados", projects_subtitle: "Uma vitrine de projetos que desenhei e construí.",
+    proj1_label: "Plataforma de Agência de Viagens", proj1_desc: "Um site que ajuda viajantes a planejar e reservar suas viagens com facilidade.",
+    proj2_label: "Portal de Entregas Escolares", proj2_desc: "Uma plataforma de gestão de tarefas para educadores criarem, atribuírem e rastrearem tarefas de estudantes.",
+    proj3_label: "Desafio Brawl Stars", proj3_desc: "Uma plataforma de desafios divertida e envolvente para jogadores de Brawl Stars testarem suas habilidades e competirem com amigos.",
+    live_demo: "Demo ao vivo", source_code: "Código fonte",
+    test_label: "Depoimentos", test_title: "O que dizem",
+    test1: "Um desenvolvedor excepcional que entrega trabalho de alta qualidade.",
+    test2: "Transformou nossa visão em um produto bonito e funcional.",
+    test3: "Um dos desenvolvedores mais talentosos com quem já trabalhei.",
+    contact_label: "Fale comigo", contact_title: "Vamos trabalhar juntos", contact_subtitle: "Tem um projeto em mente? Me envie uma mensagem.",
+    availability: "Disponibilidade", avail_value: "Aberto a oportunidades", location: "Localização", loc_value: "Remoto / Mundial",
+    placeholder_name: "Seu nome", placeholder_email: "Seu email", placeholder_project: "Conte-me sobre seu projeto...", send_msg: "Enviar mensagem",
+    footer: "&copy; 2026 Wildn. Feito com carinho."
+  },
+  de: {
+    lang_name: "German", loading: "Laden", badge_text: "Diese Seite kann in Ihre Sprache übersetzt werden!",
+    nav_about: "Über mich", nav_skills: "Fähigkeiten", nav_projects: "Projekte", nav_contact: "Kontakt",
+    hero_tag: "Freelance verfügbar", hero_title_1: "Bereit, Ihre", hero_title_2: "Website", hero_title_3: "zu bauen",
+    hero_desc: "Ein leidenschaftlicher Entwickler, der gerne saubere, moderne Websites erstellt, die Ihnen helfen, sich abzuheben. Lassen Sie uns gemeinsam etwas Großartiges schaffen.",
+    hero_btn_work: "Meine Arbeit ansehen", hero_btn_touch: "Kontaktiere mich", hero_scroll: "scrollen",
+    about_label: "Über mich", about_title: "Bereit, Ihre nächste<br>Website zu bauen", about_exp: "Lernjahre", about_projects_done: "Erstellte Projekte",
+    about_p1: "Ich bin ein Entwickler, der es liebt, Ideen in echte Websites umzuwandeln. Ich konzentriere mich darauf, Dinge sauber, schnell und einfach zu bedienen zu machen.",
+    about_p2: "Wenn ich nicht programmiere, lerne ich normalerweise neue Tools, experimentiere mit Nebenprojekten oder helfe anderen, in die Technik einzusteigen.",
+    stat_projects: "Projekte", stat_clients: "Kunden", stat_happy: "Zufriedenheit %",
+    skills_label: "Meine Fähigkeiten", skills_title: "Technologien, mit denen ich arbeite", skills_subtitle: "Eine kuratierte Sammlung von Tools und Technologien.",
+    cat_all: "Alle", proficiency: "Kenntnisse",
+    skill_react: "Saubere, semantische Markup schreiben, das das Web strukturiert.",
+    skill_ts: "Responsives Layout und schöne visuelle Designs von Grund auf gestalten.",
+    skill_tw: "Websites mit Interaktivität und dynamischen Inhalten zum Leben erwecken.",
+    skill_node: "Serverseitiges Skripting für dynamische Webseiten und Formularverarbeitung.",
+    skill_py: "Automatisierung, Datenaufgaben und Backend-Skripting mit Python.",
+    skill_pg: "Daten für Webanwendungen organisieren und abfragen.",
+    skill_figma: "Saubere Layouts gestalten und Prototypen vor dem Bauen erstellen.",
+    projects_label: "Hervorgehobene Arbeit", projects_title: "Ausgewählte Projekte", projects_subtitle: "Eine Auswahl von Projekten, die ich entworfen und gebaut habe.",
+    proj1_label: "Reisebüro-Plattform", proj1_desc: "Eine Website, die Reisenden hilft, ihre Reisen einfach zu planen und zu buchen.",
+    proj2_label: "Schulportal", proj2_desc: "Eine Aufgabenverwaltungsplattform für Pädagogen, um Schüleraufgaben zu erstellen, zuzuweisen und zu verfolgen.",
+    proj3_label: "Brawl Stars Herausforderung", proj3_desc: "Eine unterhaltsame und ansprechende Herausforderungsplattform für Brawl Stars Spieler, um ihre Fähigkeiten zu testen und mit Freunden zu konkurrieren.",
+    live_demo: "Live-Demo", source_code: "Quellcode",
+    test_label: "Referenzen", test_title: "Was andere sagen",
+    test1: "Ein außergewöhnlicher Entwickler, der konstant Hochqualitätsarbeit liefert.",
+    test2: "Hat unsere Vision in ein schönes, funktionales Produkt verwandelt.",
+    test3: "Einer der talentiertesten Entwickler, mit denen ich gearbeitet habe.",
+    contact_label: "Kontaktiere mich", contact_title: "Lass uns zusammenarbeiten", contact_subtitle: "Hast du ein Projekt im Sinn? Schreib mir eine Nachricht.",
+    availability: "Verfügbarkeit", avail_value: "Offen für Möglichkeiten", location: "Standort", loc_value: "Remote / Weltweit",
+    placeholder_name: "Dein Name", placeholder_email: "Deine E-Mail", placeholder_project: "Erzähl mir von deinem Projekt...", send_msg: "Nachricht senden",
+    footer: "&copy; 2026 Wildn. Mit Liebe gemacht."
+  }
+};
+
+var currentLang = localStorage.getItem('preferred-lang') || 'en';
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('preferred-lang', lang);
+  var t = translations[lang];
+  if (!t) return;
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-placeholder');
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  document.querySelectorAll('.translate-option').forEach(function(opt) {
+    opt.classList.toggle('active', opt.getAttribute('data-lang') === lang);
+  });
+  var label = document.querySelector('.translate-toggle-label');
+  if (label) label.textContent = t.lang_name || lang;
+}
+
+// ─── BUILD TRANSLATE DROPDOWN ───
+var langList = [
+  { code: 'en', name: 'English', flag: '\u{1F1FA}\u{1F1F8}' },
+  { code: 'id', name: 'Indonesian', flag: '\u{1F1EE}\u{1F1E9}' },
+  { code: 'ja', name: 'Japanese', flag: '\u{1F1EF}\u{1F1F5}' },
+  { code: 'ko', name: 'Korean', flag: '\u{1F1F0}\u{1F1F7}' },
+  { code: 'zh-CN', name: 'Chinese', flag: '\u{1F1E8}\u{1F1F3}' },
+  { code: 'ar', name: 'Arabic', flag: '\u{1F1F8}\u{1F1E6}' },
+  { code: 'es', name: 'Spanish', flag: '\u{1F1EA}\u{1F1F8}' },
+  { code: 'fr', name: 'French', flag: '\u{1F1EB}\u{1F1F7}' },
+  { code: 'pt', name: 'Portuguese', flag: '\u{1F1E7}\u{1F1F7}' },
+  { code: 'de', name: 'German', flag: '\u{1F1E9}\u{1F1EA}' }
+];
+var dropdown = document.getElementById('translateDropdown');
+var translateWrapper = document.getElementById('translateWrapper');
+var translateBadge = document.getElementById('translateBadge');
+var translateBadgeClose = document.getElementById('translateBadgeClose');
+
+langList.forEach(function(lang) {
+  var btn = document.createElement('button');
+  btn.className = 'translate-option';
+  btn.setAttribute('data-lang', lang.code);
+  btn.innerHTML = '<span class="translate-option-flag">' + lang.flag + '</span> ' + lang.name;
+  btn.addEventListener('click', function() { setLanguage(lang.code); translateWrapper.classList.remove('open'); });
+  dropdown.appendChild(btn);
+});
+
+document.getElementById('translateToggle').addEventListener('click', function(e) { e.stopPropagation(); translateWrapper.classList.toggle('open'); });
+document.addEventListener('click', function(e) { if (!translateWrapper.contains(e.target)) translateWrapper.classList.remove('open'); });
+
+var badgeTimeout;
+function dismissBadge() { translateBadge.classList.remove('visible'); localStorage.setItem('translate-badge-dismissed', '1'); if (badgeTimeout) clearTimeout(badgeTimeout); }
+translateBadgeClose.addEventListener('click', dismissBadge);
+if (!localStorage.getItem('translate-badge-dismissed')) {
+  setTimeout(function() { translateBadge.classList.add('visible'); }, 1500);
+  badgeTimeout = setTimeout(dismissBadge, 8000);
+}
+
+setLanguage(currentLang);
+
+// ─── PRELOADER ───
+window.addEventListener('load', function() { setTimeout(function() { document.getElementById('preloader').classList.add('hidden'); }, 800); });
+
+// ─── CURSOR GLOW ───
+var cursorGlow = document.getElementById('cursorGlow');
+var mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', function(e) { mouseX = e.clientX; mouseY = e.clientY; });
+(function animCursor() { cursorGlow.style.left = mouseX + 'px'; cursorGlow.style.top = mouseY + 'px'; requestAnimationFrame(animCursor); })();
+
+// ─── SCROLL PROGRESS ───
+var progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', function() { progressBar.style.width = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100) + '%'; });
+
+// ─── NAVBAR SCROLL ───
+var navbar = document.getElementById('navbar');
+window.addEventListener('scroll', function() { navbar.classList.toggle('scrolled', window.scrollY > 50); });
+
+// ─── BACK TO TOP ───
+var backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', function() { backToTop.classList.toggle('visible', window.scrollY > 500); });
+backToTop.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+// ─── REVEAL ON SCROLL ───
+var revealObserver = new IntersectionObserver(function(entries) { entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.classList.add('active'); }); }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(function(el) { revealObserver.observe(el); });
+
+// ─── SKILL BAR ANIMATION ───
+var skillObserver = new IntersectionObserver(function(entries) { entries.forEach(function(entry) { if (entry.isIntersecting) entry.target.style.width = entry.target.getAttribute('data-width') + '%'; }); }, { threshold: 0.5 });
+document.querySelectorAll('.skill-bar-fill').forEach(function(bar) { skillObserver.observe(bar); });
+
+// ─── COUNTER ANIMATION ───
+var counterObserver = new IntersectionObserver(function(entries) { entries.forEach(function(entry) {
+  if (!entry.isIntersecting) return;
+  var el = entry.target, target = parseInt(el.getAttribute('data-count')), current = 0, increment = target / 5;
+  var timer = setInterval(function() { current += increment; if (current >= target) { el.textContent = target + '+'; clearInterval(timer); } else { el.textContent = Math.floor(current) + '+'; } }, 30);
+  counterObserver.unobserve(el);
+}); }, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(function(c) { counterObserver.observe(c); });
+
+// ─── TIMELINE FILL ───
+var timelineFill = document.getElementById('timelineFill');
+var timelineSection = document.querySelector('.timeline-section');
+window.addEventListener('scroll', function() {
+  if (!timelineSection) return;
+  var rect = timelineSection.getBoundingClientRect(), sectionHeight = timelineSection.offsetHeight, scrolled = Math.max(0, -rect.top), totalScrollable = sectionHeight - window.innerHeight;
+  timelineFill.style.height = Math.min(100, Math.max(0, (scrolled / totalScrollable) * 100)) + '%';
+});
+
+// ─── SKILL FILTER ───
+var filterBtns = document.querySelectorAll('.skill-cat-btn');
+var skillCards = document.querySelectorAll('.skill-card');
+filterBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    filterBtns.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    var filter = btn.getAttribute('data-filter');
+    skillCards.forEach(function(card) {
+      if (filter === 'all' || card.getAttribute('data-category') === filter) { card.style.display = ''; setTimeout(function() { card.style.opacity = '1'; }, 10); }
+      else { card.style.opacity = '0'; setTimeout(function() { card.style.display = 'none'; }, 400); }
+    });
+  });
+});
+
+// ─── SMOOTH ANCHOR SCROLL ───
+document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+  anchor.addEventListener('click', function(e) { e.preventDefault(); var target = document.querySelector(anchor.getAttribute('href')); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+});
+
+// ─── EMAILJS CONTACT FORM ───
+emailjs.init({ publicKey: 'imNGWhtAw6cdh0dwB' });
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var form = this;
+  var btn = form.querySelector('button');
+  var originalText = btn.innerHTML;
+  btn.innerHTML = '<span>Sending...</span>';
+  btn.disabled = true;
+  var params = {
+    name: form.name.value,
+    from_name: form.name.value,
+    from_email: form.from_email.value,
+    message: form.project_details.value,
+    project_details: form.project_details.value
+  };
+  emailjs.send('service_wm', 'template_b4s1c', params).then(function() {
+    btn.innerHTML = '<span>Sent!</span>';
+    form.reset();
+    setTimeout(function() { btn.innerHTML = originalText; btn.disabled = false; }, 3000);
+  }, function() {
+    btn.innerHTML = '<span>Failed. Try email.</span>';
+    setTimeout(function() { btn.innerHTML = originalText; btn.disabled = false; }, 3000);
+  });
+});
+</script>
+</body>
+</html>
