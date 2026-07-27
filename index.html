@@ -32,7 +32,7 @@ html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--pr
 body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; line-height: 1.6; }
 h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
 
-.cursor-glow { position: fixed; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(108,92,231,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%); }
+.cursor-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(108,92,231,0.04) 0%, transparent 70%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%); }
 
 .preloader { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; transition: opacity 0.6s ease, visibility 0.6s ease; }
 .preloader.hidden { opacity: 0; visibility: hidden; }
@@ -70,10 +70,10 @@ section { position: relative; z-index: 1; }
 .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 80px 60px 0; }
 .hero-bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(108,92,231,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(108,92,231,0.05) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%); }
 .hero-orbs { position: absolute; inset: 0; overflow: hidden; }
-.hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; }
-.hero-orb-1 { width: 500px; height: 500px; background: var(--primary); top: -10%; right: -5%; animation: float-orb 8s ease-in-out infinite; }
-.hero-orb-2 { width: 400px; height: 400px; background: var(--accent); bottom: -10%; left: -5%; animation: float-orb 10s ease-in-out infinite reverse; }
-.hero-orb-3 { width: 300px; height: 300px; background: #fd79a8; top: 50%; left: 40%; animation: float-orb 12s ease-in-out infinite 2s; }
+.hero-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; }
+.hero-orb-1 { width: 350px; height: 350px; background: var(--primary); top: -10%; right: -5%; animation: float-orb 8s ease-in-out infinite; }
+.hero-orb-2 { width: 250px; height: 250px; background: var(--accent); bottom: -10%; left: -5%; animation: float-orb 10s ease-in-out infinite reverse; }
+.hero-orb-3 { width: 200px; height: 200px; background: #fd79a8; top: 50%; left: 40%; animation: float-orb 12s ease-in-out infinite 2s; }
 .hero-content { text-align: center; position: relative; z-index: 2; max-width: 900px; }
 .hero-tag { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(108,92,231,0.12); border: 1px solid rgba(108,92,231,0.25); border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--primary-light); margin-bottom: 32px; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.3s; }
 .hero-tag-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
@@ -82,8 +82,8 @@ section { position: relative; z-index: 1; }
 .hero-desc { font-size: clamp(16px, 2vw, 22px); color: var(--text-muted); max-width: 600px; margin: 0 auto 48px; line-height: 1.7; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.7s; }
 .hero-cta { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.9s; }
 .btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 36px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; cursor: pointer; border: none; font-family: 'Inter', sans-serif; }
-.btn-primary { background: var(--gradient-1); color: #fff; box-shadow: 0 4px 30px rgba(108,92,231,0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(108,92,231,0.5); }
+.btn-primary { background: var(--gradient-1); color: #fff; box-shadow: 0 4px 20px rgba(108,92,231,0.2); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,92,231,0.35); }
 .btn-ghost { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.15); }
 .btn-ghost:hover { border-color: var(--primary); background: rgba(108,92,231,0.08); transform: translateY(-2px); }
 .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; opacity: 0; animation: fadeInUp 0.8s ease forwards 1.2s; }
@@ -117,7 +117,7 @@ section { position: relative; z-index: 1; }
 .skill-card { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 32px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
 .skill-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-1); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
 .skill-card:hover::before { transform: scaleX(1); }
-.skill-card:hover { transform: translateY(-6px); border-color: rgba(108,92,231,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.skill-card:hover { transform: translateY(-6px); border-color: rgba(108,92,231,0.2); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
 .skill-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
 .skill-icon.icon-purple { background: rgba(108,92,231,0.15); }
 .skill-icon.icon-teal { background: rgba(0,206,201,0.15); }
@@ -176,18 +176,6 @@ section { position: relative; z-index: 1; }
 .timeline-item h4 { font-size: 14px; color: var(--primary-light); font-weight: 500; margin-bottom: 12px; }
 .timeline-item p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
 
-.testimonials { background: var(--dark); }
-.testimonials-container { max-width: 1200px; margin: 0 auto; }
-.testimonials-header { text-align: center; margin-bottom: 60px; }
-.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.testimonial-card { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 36px; transition: all 0.4s ease; position: relative; }
-.testimonial-card:hover { transform: translateY(-4px); border-color: rgba(108,92,231,0.2); }
-.testimonial-quote { font-size: 40px; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 16px; }
-.testimonial-card p { font-size: 15px; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; font-style: italic; }
-.testimonial-author { display: flex; align-items: center; gap: 14px; }
-.testimonial-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: #fff; }
-.testimonial-name { font-size: 14px; font-weight: 600; }
-.testimonial-role { font-size: 12px; color: var(--text-muted); }
 
 .contact { background: var(--dark); }
 .contact-container { max-width: 900px; margin: 0 auto; }
@@ -265,7 +253,6 @@ section { position: relative; z-index: 1; }
   .about-float-card { display: none; }
   .project-card { grid-template-columns: 1fr; gap: 32px; }
   .project-card:nth-child(even) { direction: ltr; }
-  .testimonials-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .timeline-item:nth-child(odd), .timeline-item:nth-child(even) { padding: 0 0 0 calc(50% + 30px); text-align: left; justify-content: flex-start; }
   .timeline-line { left: 20px; }
@@ -594,9 +581,6 @@ var translations = {
     proj3_label: "Brawl Stars Challenge", proj3_desc: "A fun and engaging challenge platform for Brawl Stars players to test their skills and compete with friends.",
     live_demo: "Live Demo", watch_demo: "Watch Demo", source_code: "Source Code",
     test_label: "Testimonials", test_title: "What people say",
-    test1: "An exceptional developer who consistently delivers high-quality work. Their attention to detail and problem-solving skills are outstanding.",
-    test2: "Transformed our vision into a beautiful, functional product. The collaboration was seamless and the results exceeded expectations.",
-    test3: "One of the most talented developers I've worked with. They bring both technical expertise and creative thinking to every project.",
     contact_label: "Get In Touch", contact_title: "Let's work together", contact_subtitle: "Have a project in mind? I'd love to hear about it. Drop me a message and let's create something amazing.",
     availability: "Availability", avail_value: "Open to opportunities", location: "Location", loc_value: "Remote / Worldwide",
     placeholder_name: "Your Name", placeholder_email: "Your Email", placeholder_project: "Tell me about your project...", send_msg: "Send Message",
@@ -627,9 +611,6 @@ var translations = {
     proj3_label: "Tantangan Brawl Stars", proj3_desc: "Platform tantangan yang menyenangkan dan menarik untuk pemain Brawl Stars menguji keterampilan dan bersaing dengan teman.",
     live_demo: "Demo Langsung", watch_demo: "Tonton Demo", source_code: "Kode Sumber",
     test_label: "Testimoni", test_title: "Apa kata orang",
-    test1: "Pengembang luar biasa yang secara konsisten memberikan pekerjaan berkualitas tinggi. Perhatian terhadap detail dan keterampilan pemecahan masalahnya sangat menonjol.",
-    test2: "Mengubah visi kami menjadi produk yang indah dan fungsional. Kolaborasinya berjalan lancar dan hasilnya melebihi ekspektasi.",
-    test3: "Sal satu pengembang paling berbakat yang pernah saya ajak bekerja. Mereka membawa keahlian teknis dan pemikiran kreatif di setiap proyek.",
     contact_label: "Hubungi Saya", contact_title: "Mari bekerja sama", contact_subtitle: "Ada proyek yang ingin dibicarakan? Saya ingin mendengarnya. Kirim pesan dan mari ciptakan sesuatu yang luar biasa.",
     availability: "Ketersediaan", avail_value: "Terbuka untuk peluang", location: "Lokasi", loc_value: "Remote / Seluruh Dunia",
     placeholder_name: "Nama Anda", placeholder_email: "Email Anda", placeholder_project: "Ceritakan tentang proyek Anda...", send_msg: "Kirim Pesan",
@@ -660,9 +641,6 @@ var translations = {
     proj3_label: "ブロスタチャレンジ", proj3_desc: "ブロスタのプレイヤーがスキルをテストし、友達と競い合える楽しいチャレンジプラットフォーム。",
     live_demo: "ライブデモ", watch_demo: "デモを見る", source_code: "ソースコード",
     test_label: "お客様の声", test_title: "お客様の評価",
-    test1: "一貫して高品質な仕事を提供する卓越した開発者。細部へのこだわりと問題解決スキルは素晴らしい。",
-    test2: "私たちのビジョンを美丽で機能的なプロダクトに変革。コラボレーションはシームレスで、結果は期待を上回った。",
-    test3: "一緒に仕事をした中で最も才能ある開発者の一人。技術的専門知識とクリエイティブな思考をすべてのプロジェクトにbringしている。",
     contact_label: "お問い合わせ", contact_title: "一緒に働きましょう", contact_subtitle: "プロジェクトについてのご相談があればお気軽にメッセージをお送りください。素晴らしいものを作りましょう。",
     availability: "対応可能", avail_value: "新しい機会を歓迎", location: "場所", loc_value: "リモート / 世界中",
     placeholder_name: "お名前", placeholder_email: "メールアドレス", placeholder_project: "プロジェクトについて教えてください...", send_msg: "メッセージを送信",
@@ -693,9 +671,6 @@ var translations = {
     proj3_label: "브롤스타즈 챌린지", proj3_desc: "브롤스타즈 플레이어가 스킬을 테스트하고 친구와 경쟁할 수 있는 재미있는 챌린지 플랫폼.",
     live_demo: "라이브 데모", watch_demo: "데모 보기", source_code: "소스 코드",
     test_label: "후기", test_title: "고객들의 평가",
-    test1: "일관되게 고품질 작업을 제공하는 뛰어난 개발자. 세심한 관심과 문제 해결 기술이 뛰어납니다.",
-    test2: "우리의 비전을 아름답고 기능적인 제품으로 변환. 협업이 원활했고 결과가 기대를 초과했습니다.",
-    test3: "함께 일한 개발자 중 가장 재능 있는 개발자 중 한 명.",
     contact_label: "연락하기", contact_title: "함께 일합시다", contact_subtitle: "프로젝트에 대해 이야기하고 싶으시다면 메시지를 보내주세요.",
     availability: "가용성", avail_value: "새로운 기회 환영", location: "위치", loc_value: "원격 / 전 세계",
     placeholder_name: "이름", placeholder_email: "이메일", placeholder_project: "프로젝트에 대해 알려주세요...", send_msg: "메시지 보내기",
@@ -726,9 +701,6 @@ var translations = {
     proj3_label: "荒野乱斗挑战", proj3_desc: "一个有趣且引人入胜的挑战平台，让荒野乱斗玩家测试技能并与朋友竞争。",
     live_demo: "在线演示", watch_demo: "观看演示", source_code: "源代码",
     test_label: "客户评价", test_title: "客户评价",
-    test1: "一位持续交付高质量工作的杰出开发者。对细节的关注和解决问题的能力非常出色。",
-    test2: "将我们的愿景转变为美丽、实用的产品。合作无缝，结果超出了预期。",
-    test3: "与我合作过的最有才华的开发者之一。",
     contact_label: "联系我", contact_title: "一起合作", contact_subtitle: "有项目想法？我很想听听。给我发消息，让我们一起创造一些了不起的东西。",
     availability: "可用性", avail_value: "接受新机会", location: "位置", loc_value: "远程 / 全球",
     placeholder_name: "您的姓名", placeholder_email: "您的邮箱", placeholder_project: "告诉我关于您的项目...", send_msg: "发送消息",
@@ -759,9 +731,6 @@ var translations = {
     proj3_label: "تحدي براول ستارز", proj3_desc: "منصة تحدي ممتعة وجذابة للاعبين براول ستارز لاختبار مهاراتهم والتنافس مع الأصدقاء.",
     live_demo: "عرض مباشر", watch_demo: "شاهد العرض", source_code: "الكود المصدري",
     test_label: "شهادات", test_title: "ماذا يقول الناس",
-    test1: "مطور استثنائي يقدم عملاً عالي الجودة باستمرار.",
-    test2: "حول رؤيتنا إلى منتج جميل وعملي. كان التعاون سلساً والنتائج فاقت التوقعات.",
-    test3: "واحد من أكثر المطورين موهبة عملت معهم.",
     contact_label: "تواصل معي", contact_title: "لنعمل معاً", contact_subtitle: "لديك مشروع في ذهنك؟ يسعدني سماعه. أرسل لي رسالة.",
     availability: "التوفر", avail_value: "متاح للفرص", location: "الموقع", loc_value: "عن بُعد / في جميع أنحاء العالم",
     placeholder_name: "اسمك", placeholder_email: "بريدك الإلكتروني", placeholder_project: "أخبرني عن مشروعك...", send_msg: "إرسال رسالة",
@@ -792,9 +761,6 @@ var translations = {
     proj3_label: "Desafío Brawl Stars", proj3_desc: "Una plataforma de desafíos divertida y atractiva para que los jugadores de Brawl Stars prueben sus habilidades y compitan con amigos.",
     live_demo: "Demo en vivo", watch_demo: "Ver Demo", source_code: "Código fuente",
     test_label: "Testimonios", test_title: "Lo que dicen",
-    test1: "Un desarrollador excepcional que entrega consistentemente trabajo de alta calidad.",
-    test2: "Transformó nuestra visión en un producto hermoso y funcional.",
-    test3: "Uno de los desarrolladores más talentosos con los que he trabajado.",
     contact_label: "Contáctame", contact_title: "Trabajemos juntos", contact_subtitle: "¿Tienes un proyecto en mente? Envíame un mensaje.",
     availability: "Disponibilidad", avail_value: "Abierto a oportunidades", location: "Ubicación", loc_value: "Remoto / Mundial",
     placeholder_name: "Tu nombre", placeholder_email: "Tu correo", placeholder_project: "Cuéntame sobre tu proyecto...", send_msg: "Enviar mensaje",
@@ -825,9 +791,6 @@ var translations = {
     proj3_label: "Défi Brawl Stars", proj3_desc: "Une plateforme de défis amusante et engageante pour les joueurs de Brawl Stars tester leurs compétitions et rivaliser avec des amis.",
     live_demo: "Démo en direct", watch_demo: "Voir la Démo", source_code: "Code source",
     test_label: "Témoignages", test_title: "Ce que les gens disent",
-    test1: "Un développeur exceptionnel qui livre constamment un travail de haute qualité.",
-    test2: "A transformé notre vision en un produit beau et fonctionnel.",
-    test3: "L'un des développeurs les plus talentueux avec qui j'ai travaillé.",
     contact_label: "Contactez-moi", contact_title: "Travaillons ensemble", contact_subtitle: "Vous avez un projet en tête? Envoyez-moi un message.",
     availability: "Disponibilité", avail_value: "Ouvert aux opportunités", location: "Emplacement", loc_value: "À distance / Monde entier",
     placeholder_name: "Votre nom", placeholder_email: "Votre email", placeholder_project: "Parlez-moi de votre projet...", send_msg: "Envoyer le message",
@@ -858,9 +821,6 @@ var translations = {
     proj3_label: "Desafio Brawl Stars", proj3_desc: "Uma plataforma de desafios divertida e envolvente para jogadores de Brawl Stars testarem suas habilidades e competirem com amigos.",
     live_demo: "Demo ao vivo", watch_demo: "Ver Demo", source_code: "Código fonte",
     test_label: "Depoimentos", test_title: "O que dizem",
-    test1: "Um desenvolvedor excepcional que entrega trabalho de alta qualidade.",
-    test2: "Transformou nossa visão em um produto bonito e funcional.",
-    test3: "Um dos desenvolvedores mais talentosos com quem já trabalhei.",
     contact_label: "Fale comigo", contact_title: "Vamos trabalhar juntos", contact_subtitle: "Tem um projeto em mente? Me envie uma mensagem.",
     availability: "Disponibilidade", avail_value: "Aberto a oportunidades", location: "Localização", loc_value: "Remoto / Mundial",
     placeholder_name: "Seu nome", placeholder_email: "Seu email", placeholder_project: "Conte-me sobre seu projeto...", send_msg: "Enviar mensagem",
@@ -891,9 +851,6 @@ var translations = {
     proj3_label: "Brawl Stars Herausforderung", proj3_desc: "Eine unterhaltsame und ansprechende Herausforderungsplattform für Brawl Stars Spieler, um ihre Fähigkeiten zu testen und mit Freunden zu konkurrieren.",
     live_demo: "Live-Demo", watch_demo: "Demo ansehen", source_code: "Quellcode",
     test_label: "Referenzen", test_title: "Was andere sagen",
-    test1: "Ein außergewöhnlicher Entwickler, der konstant Hochqualitätsarbeit liefert.",
-    test2: "Hat unsere Vision in ein schönes, funktionales Produkt verwandelt.",
-    test3: "Einer der talentiertesten Entwickler, mit denen ich gearbeitet habe.",
     contact_label: "Kontaktiere mich", contact_title: "Lass uns zusammenarbeiten", contact_subtitle: "Hast du ein Projekt im Sinn? Schreib mir eine Nachricht.",
     availability: "Verfügbarkeit", avail_value: "Offen für Möglichkeiten", location: "Standort", loc_value: "Remote / Weltweit",
     placeholder_name: "Dein Name", placeholder_email: "Deine E-Mail", placeholder_project: "Erzähl mir von deinem Projekt...", send_msg: "Nachricht senden",
